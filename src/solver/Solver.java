@@ -1,7 +1,9 @@
 package solver;
 
+import exceptions.WrongMatrixSizeException;
+
 public interface Solver {
 
-    void solve();
+    double[] solve();
 
 }
