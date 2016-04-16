@@ -13,9 +13,9 @@ public class SimpleLinearProblemSolver implements Solver {
     private final String delimiter = ";";
 
     private String goal;
-    private int[] goalFunctionVariablesFactors;
-    private LinkedList<int[]> problemVariableFactors = new LinkedList<>();
-    private LinkedList<Integer> problemLimits = new LinkedList<>();
+    private double[] goalFunctionVariablesFactors;
+    private LinkedList<double[]> problemVariableFactors = new LinkedList<>();
+    private LinkedList<Double> problemLimits = new LinkedList<>();
     private LinkedList<String> inequalitySings = new LinkedList<>();
 
     public SimpleLinearProblemSolver(String path) throws FileNotFoundException, WrongFileFormatException, NumberFormatException {
@@ -29,11 +29,11 @@ public class SimpleLinearProblemSolver implements Solver {
         //find all suspicious points
         for (int i = 0; i < problemVariableFactors.size(); i++) {
             for (int j = i + 1; j < problemVariableFactors.size(); j++) {
-                int[][] a = new int[][]{
+                double[][] a = new double[][]{
                         problemVariableFactors.get(i),
                         problemVariableFactors.get(j)
                 };
-                int[] b = new int[]{
+                double[] b = new double[]{
                         problemLimits.get(i),
                         problemLimits.get(j),
                 };
@@ -67,8 +67,8 @@ public class SimpleLinearProblemSolver implements Solver {
 
     private boolean meetsAllConditions(double[] point) {
         for (int i = 0; i < problemLimits.size(); i++) {
-            int a = problemVariableFactors.get(i)[0];
-            int b = problemVariableFactors.get(i)[1];
+            double a = problemVariableFactors.get(i)[0];
+            double b = problemVariableFactors.get(i)[1];
             double value = a * point[0] + b * point[1];
 
             if (inequalitySings.get(i).equals("le")) {
@@ -103,9 +103,9 @@ public class SimpleLinearProblemSolver implements Solver {
             line = in.nextLine();
             String[] stringFactors = line.split(delimiter);
             try {
-                goalFunctionVariablesFactors = new int[]{
-                        Integer.parseInt(stringFactors[0]),
-                        Integer.parseInt(stringFactors[1])
+                goalFunctionVariablesFactors = new double[]{
+                        Double.parseDouble(stringFactors[0]),
+                        Double.parseDouble(stringFactors[1])
                 };
             } catch (NumberFormatException e) {
                 throw e;
@@ -119,11 +119,11 @@ public class SimpleLinearProblemSolver implements Solver {
                     if (stringValues.length != 4) {
                         throw new WrongFileFormatException();
                     }
-                    problemVariableFactors.add(new int[]{
-                            Integer.parseInt(stringValues[0]),
-                            Integer.parseInt(stringValues[1])
+                    problemVariableFactors.add(new double[]{
+                            Double.parseDouble(stringValues[0]),
+                            Double.parseDouble(stringValues[1])
                     });
-                    problemLimits.add(Integer.parseInt(stringValues[2]));
+                    problemLimits.add(Double.parseDouble(stringValues[2]));
                     if (!stringValues[3].equals("le") && !stringValues[3].equals("ge")) {
                         throw new WrongFileFormatException();
                     }
