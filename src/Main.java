@@ -1,6 +1,8 @@
 
 import exceptions.WrongFileFormatException;
+import problem.DualProblem;
 import problem.SimpleLinearProblem;
+import solver.DualProblemSolver;
 import solver.SimpleLinearProblemSolver;
 import solver.Solver;
 
@@ -17,8 +19,17 @@ public class Main {
             } catch (FileNotFoundException | WrongFileFormatException | NumberFormatException e) {
                 System.out.println(e.getMessage());
             }
+        } else if (args.length == 2 && args[0].equals("dual")) {
+            try {
+                DualProblem problem = new DualProblem(args[1]);
+                Solver solver = new DualProblemSolver(problem);
+                double[] result = solver.solve();
+                System.out.println("[" + result[0] + " " + result[1] + "]");
+            } catch (FileNotFoundException | WrongFileFormatException | NumberFormatException e) {
+                System.out.println(e.getMessage());
+            }
         } else {
-            System.out.println("Wrong number of arguments");
+            System.out.println("Wrong arguments");
         }
     }
 }
