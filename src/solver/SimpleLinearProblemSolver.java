@@ -1,56 +1,31 @@
 package solver;
 
-import exceptions.WrongFileFormatException;
+import problem.SimpleLinearProblem;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Scanner;
 
 public class SimpleLinearProblemSolver implements Solver {
 
-    private final String delimiter = ";";
+    private SimpleLinearProblem problem;
 
-    private String goal;
-    private double[] goalFunctionVariablesFactors;
-    private LinkedList<double[]> problemVariableFactors = new LinkedList<>();
-    private LinkedList<Double> problemLimits = new LinkedList<>();
-    private LinkedList<String> inequalitySings = new LinkedList<>();
-
-    public SimpleLinearProblemSolver(String path) throws FileNotFoundException, WrongFileFormatException, NumberFormatException {
-        loadData(path);
+    public SimpleLinearProblemSolver(SimpleLinearProblem problem) {
+        this.problem = problem;
     }
 
     public double[] solve() {
-        LinkedList<double[]> points = new LinkedList<>();
-        LinkedList<Double> goalFunctionValues = new LinkedList<>();
-
         //find all suspicious points
-        for (int i = 0; i < problemVariableFactors.size(); i++) {
-            for (int j = i + 1; j < problemVariableFactors.size(); j++) {
-                double[][] a = new double[][]{
-                        problemVariableFactors.get(i),
-                        problemVariableFactors.get(j)
-                };
-                double[] b = new double[]{
-                        problemLimits.get(i),
-                        problemLimits.get(j),
-                };
-                LinearEquationSolver linearEquationSolver = new LinearEquationSolver(a, b);
-                double[] result = linearEquationSolver.solve();
+        LinkedList<double[]> points = findSuspiciousPoints();
 
-                //count goal function value for each point meeting problem conditions
-                if (result != null && meetsAllConditions(result)) {
-                    double value = countGoalFunctionValue(result);
-                    goalFunctionValues.add(value);
-                    points.add(result);
-                }
-            }
-        }
+        //count goal function values for suspicious points
+        LinkedList<Double> goalFunctionValues = countGoalFunctionValues(points);
 
-        //check which one is the solution
-        if (goal.equals("max")) {
+        //find and return the solution
+        return findSolution(points, goalFunctionValues);
+    }
+
+    private double[] findSolution(LinkedList<double[]> points, LinkedList<Double> goalFunctionValues) {
+        if (problem.getGoal().equals("max")) {
             double maxValue = Collections.max(goalFunctionValues);
             int index = goalFunctionValues.indexOf(maxValue);
             return points.get(index);
@@ -61,73 +36,65 @@ public class SimpleLinearProblemSolver implements Solver {
         }
     }
 
+    private LinkedList<double[]> findSuspiciousPoints() {
+        LinkedList<double[]> result = new LinkedList<>();
+
+        for (int i = 0; i < problem.getVariablesFactors().size(); i++) {
+            for (int j = i + 1; j < problem.getVariablesFactors().size(); j++) {
+                double[][] a = new double[][]{
+                        problem.getVariablesFactors().get(i),
+                        problem.getVariablesFactors().get(j)
+                };
+                double[] b = new double[]{
+                        problem.getLimits().get(i),
+                        problem.getLimits().get(j),
+                };
+                LinearEquationSolver linearEquationSolver = new LinearEquationSolver(a, b);
+                double[] point = linearEquationSolver.solve();
+                if (point != null) {
+                    result.add(point);
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private LinkedList<Double> countGoalFunctionValues(LinkedList<double[]> points) {
+        LinkedList<Double> values = new LinkedList<>();
+
+        for (double[] point : points) {
+            if (meetsAllConditions(point)) {
+                double value = countGoalFunctionValue(point);
+                values.add(value);
+            }
+
+        }
+
+        return values;
+    }
+
+    private double countGoalFunctionValue(double[] point) {
+        return problem.getGoalFunctionVariablesFactors()[0] * point[0] +
+                problem.getGoalFunctionVariablesFactors()[1] * point[1];
+    }
+
     private boolean meetsAllConditions(double[] point) {
-        for (int i = 0; i < problemLimits.size(); i++) {
-            double a = problemVariableFactors.get(i)[0];
-            double b = problemVariableFactors.get(i)[1];
+        for (int i = 0; i < problem.getLimits().size(); i++) {
+            double a = problem.getVariablesFactors().get(i)[0];
+            double b = problem.getVariablesFactors().get(i)[1];
             double value = a * point[0] + b * point[1];
 
-            if (inequalitySings.get(i).equals("le")) {
-                if (value > problemLimits.get(i)) {
+            if (problem.getInequalitySigns().get(i).equals("le")) {
+                if (value > problem.getLimits().get(i)) {
                     return false;
                 }
             } else {
-                if (value < problemLimits.get(i)) {
+                if (value < problem.getLimits().get(i)) {
                     return false;
                 }
             }
         }
         return true;
-    }
-
-    private double countGoalFunctionValue(double[] point) {
-        return goalFunctionVariablesFactors[0] * point[0] + goalFunctionVariablesFactors[1] * point[1];
-    }
-
-    private void loadData(String path) throws FileNotFoundException, WrongFileFormatException {
-        File file = new File(path);
-        try (Scanner in = new Scanner(file)) {
-            String line;
-
-            //get goal
-            goal = in.nextLine();
-            if (!goal.equals("max") && !goal.equals("min")) {
-                throw new WrongFileFormatException();
-            }
-
-            //get goalFunctionVariablesFactors
-            line = in.nextLine();
-            String[] stringFactors = line.split(delimiter);
-            try {
-                goalFunctionVariablesFactors = new double[]{
-                        Double.parseDouble(stringFactors[0]),
-                        Double.parseDouble(stringFactors[1])
-                };
-            } catch (NumberFormatException e) {
-                throw e;
-            }
-
-            //get problemVariableFactors and problemLimits
-            while (in.hasNextLine()) {
-                try {
-                    line = in.nextLine();
-                    String[] stringValues = line.split(delimiter);
-                    if (stringValues.length != 4) {
-                        throw new WrongFileFormatException();
-                    }
-                    problemVariableFactors.add(new double[]{
-                            Double.parseDouble(stringValues[0]),
-                            Double.parseDouble(stringValues[1])
-                    });
-                    problemLimits.add(Double.parseDouble(stringValues[2]));
-                    if (!stringValues[3].equals("le") && !stringValues[3].equals("ge")) {
-                        throw new WrongFileFormatException();
-                    }
-                    inequalitySings.add(stringValues[3]);
-                } catch (NumberFormatException e) {
-                    throw e;
-                }
-            }
-        }
     }
 }
