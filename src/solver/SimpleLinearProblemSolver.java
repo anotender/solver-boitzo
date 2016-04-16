@@ -39,17 +39,13 @@ public class SimpleLinearProblemSolver implements Solver {
                 };
                 LinearEquationSolver linearEquationSolver = new LinearEquationSolver(a, b);
                 double[] result = linearEquationSolver.solve();
-                if (result != null) {
+
+                //count goal function value for each point meeting problem conditions
+                if (result != null && meetsAllConditions(result)) {
+                    double value = countGoalFunctionValue(result);
+                    goalFunctionValues.add(value);
                     points.add(result);
                 }
-            }
-        }
-
-        //count goal function values for result points
-        for (double[] point : points) {
-            if (meetsAllConditions(point)) {
-                double value = countGoalFunctionValue(point);
-                goalFunctionValues.add(value);
             }
         }
 
