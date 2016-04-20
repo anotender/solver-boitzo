@@ -1,0 +1,15 @@
+{
+	"goalFunction": {
+		"goal": "max",
+		"factors": [4,6,3,12]
+	},
+	"conditions": [{
+		"factors": [1, 2, 1.5, 6],
+		"limit": 90000,
+		"sign": "<="
+	}, {
+		"factors": [2, 2, 1.5, 4],
+		"limit": 120000,
+		"sign": "<="
+	}]
+}
