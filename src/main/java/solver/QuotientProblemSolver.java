@@ -22,7 +22,7 @@ public class QuotientProblemSolver implements Solver {
                 .findSuspiciousPoints()
                 .stream()
                 .max((p1, p2) -> Double.compare(countQuotientGoalFunctionValue(p1), countQuotientGoalFunctionValue(p2)))
-                .get();
+                .orElseThrow(() -> new RuntimeException("Cannot find max value"));
     }
 
     public double countQuotientGoalFunctionValue(double[] point) {

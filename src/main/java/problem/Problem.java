@@ -26,12 +26,9 @@ public class Problem {
     }
 
     public boolean meetsAllConditions(double[] point) {
-        for (Condition c : conditions) {
-            if (!c.meetsCondition(point)) {
-                return false;
-            }
-        }
-        return true;
+        return conditions
+                .stream()
+                .allMatch(c -> c.meetsCondition(point));
     }
 
     public Problem reverse() {
