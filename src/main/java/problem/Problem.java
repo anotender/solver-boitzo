@@ -36,16 +36,16 @@ public class Problem {
 
     public Problem reverse() {
         //set up reversed function
-        GoalFunction revesedGoalFunction = new GoalFunction();
+        GoalFunction reversedGoalFunction = new GoalFunction();
 
         String goal = "max".equals(goalFunction.getGoal()) ? "min" : "max";
-        revesedGoalFunction.setGoal(goal);
+        reversedGoalFunction.setGoal(goal);
 
         double[] factors = new double[conditions.size()];
         for (int i = 0; i < factors.length; i++) {
             factors[i] = conditions.get(i).getLimit();
         }
-        revesedGoalFunction.setFactors(factors);
+        reversedGoalFunction.setFactors(factors);
 
         //set up reversed conditions
         int rows = conditions.get(0).getFactors().length;
@@ -67,7 +67,7 @@ public class Problem {
 
 
         Problem reversedProblem = new Problem();
-        reversedProblem.setGoalFunction(revesedGoalFunction);
+        reversedProblem.setGoalFunction(reversedGoalFunction);
         reversedProblem.setConditions(reversedConditions);
         return reversedProblem;
     }

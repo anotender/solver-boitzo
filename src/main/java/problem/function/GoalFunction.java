@@ -25,6 +25,6 @@ public class GoalFunction {
         for (int i = 0; i < point.length; i++) {
             result += point[i] * factors[i];
         }
-        return result;
+        return result + factors[factors.length - 1];
     }
 }

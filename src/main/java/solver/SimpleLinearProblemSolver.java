@@ -28,26 +28,7 @@ public class SimpleLinearProblemSolver implements Solver {
         return findSolution(points, values);
     }
 
-    private double[] findSolution(List<double[]> points, List<Double> values) {
-        if ("max".equals(problem.getGoalFunction().getGoal())) {
-            double maxValue = Collections.max(values);
-            int index = values.indexOf(maxValue);
-            return points.get(index);
-        } else {
-            double maxValue = Collections.min(values);
-            int index = values.indexOf(maxValue);
-            return points.get(index);
-        }
-    }
-
-    private List<Double> countGoalFunctionValues(List<double[]> points) {
-        return points
-                .stream()
-                .map(point -> problem.getGoalFunction().countValue(point))
-                .collect(Collectors.toCollection(LinkedList::new));
-    }
-
-    private List<double[]> findSuspiciousPoints() {
+    public List<double[]> findSuspiciousPoints() {
         LinkedList<double[]> points = new LinkedList<>();
 
         for (int i = 0; i < problem.getConditions().size(); i++) {
@@ -71,5 +52,24 @@ public class SimpleLinearProblemSolver implements Solver {
         }
 
         return points;
+    }
+
+    private List<Double> countGoalFunctionValues(List<double[]> points) {
+        return points
+                .stream()
+                .map(point -> problem.getGoalFunction().countValue(point))
+                .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    private double[] findSolution(List<double[]> points, List<Double> values) {
+        if ("max".equals(problem.getGoalFunction().getGoal())) {
+            double maxValue = Collections.max(values);
+            int index = values.indexOf(maxValue);
+            return points.get(index);
+        } else {
+            double maxValue = Collections.min(values);
+            int index = values.indexOf(maxValue);
+            return points.get(index);
+        }
     }
 }
