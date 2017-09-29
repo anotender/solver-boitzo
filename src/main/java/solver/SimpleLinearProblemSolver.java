@@ -43,7 +43,7 @@ public class SimpleLinearProblemSolver implements Solver {
                         cond1.getLimit(),
                         cond2.getLimit()
                 };
-                LinearEquationSolver linearEquationSolver = new LinearEquationSolver(a, b);
+                Solver linearEquationSolver = new LinearEquationSolver(a, b);
                 double[] point = linearEquationSolver.solve();
                 if (point != null && problem.meetsAllConditions(point)) {
                     points.add(point);
@@ -58,18 +58,17 @@ public class SimpleLinearProblemSolver implements Solver {
         return points
                 .stream()
                 .map(point -> problem.getGoalFunction().countValue(point))
-                .collect(Collectors.toCollection(LinkedList::new));
+                .collect(Collectors.toList());
     }
 
     private double[] findSolution(List<double[]> points, List<Double> values) {
+        double value;
         if ("max".equals(problem.getGoalFunction().getGoal())) {
-            double maxValue = Collections.max(values);
-            int index = values.indexOf(maxValue);
-            return points.get(index);
+            value = Collections.max(values);
         } else {
-            double maxValue = Collections.min(values);
-            int index = values.indexOf(maxValue);
-            return points.get(index);
+            value = Collections.min(values);
         }
+        int index = values.indexOf(value);
+        return points.get(index);
     }
 }

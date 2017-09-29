@@ -2,6 +2,8 @@ package solver;
 
 import problem.Problem;
 
+import java.util.Comparator;
+
 public class QuotientProblemSolver implements Solver {
 
     private Problem numeratorProblem;
@@ -21,7 +23,7 @@ public class QuotientProblemSolver implements Solver {
         return new SimpleLinearProblemSolver(numeratorProblem)
                 .findSuspiciousPoints()
                 .stream()
-                .max((p1, p2) -> Double.compare(countQuotientGoalFunctionValue(p1), countQuotientGoalFunctionValue(p2)))
+                .max(Comparator.comparingDouble(this::countQuotientGoalFunctionValue))
                 .orElseThrow(() -> new RuntimeException("Cannot find max value"));
     }
 
